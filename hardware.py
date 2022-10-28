@@ -2,9 +2,9 @@ import time
 from collections import deque
 from threading import Thread
 
+import pygame
 from gpiozero import LED
 from gpiozero import MotionSensor
-from playsound import playsound
 
 from event import Event
 from led_strip import LedStrip
@@ -74,7 +74,7 @@ class Hardware:
         Event(6.0, Event.GPIO, {'device': 'lid', 'value': 'off'}),
         Event(7.0, Event.LEDS, {'mode': LedStrip.MODE_FLICKER, 'color': COLOR_FLICKER}),
     ]
-    BACKGROUND_SOUNDTRACK = '~/background.mp3'
+    BACKGROUND_SOUNDTRACK = 'audio/background.mp3'
 
     def __init__(self):
         self._running = False
@@ -96,8 +96,9 @@ class Hardware:
         self.leds.set_mode(LedStrip.MODE_FLICKER, COLOR_FLICKER)
         self.leds.start()
         # background soundtrack
-        thread = Thread(target=self._background_soundtrack, daemon=True)
-        thread.start()
+        pygame.mixer.init()
+        pygame.mixer.music.load(self.BACKGROUND_SOUNDTRACK)
+        pygame.mixer.music.play()  # this is a non-blocking call
 
     def stop(self):
         self._running = False
@@ -142,18 +143,10 @@ class Hardware:
                         else:
                             gpio.off()
                 elif e.action == Event.SOUND:
-                    playsound(e.data['file'], block=False)
+                    pygame.mixer.Channel(0).play(pygame.mixer.Sound(e.data['file']))
                 elif e.action == Event.LEDS:
                     self.leds.set_mode(e.data['mode'], e.data['color'])
         except Exception as e:
             print("Animation error: {0} - {1!r}".format(type(e).__name__, e))
         print("Sequence complete")
         self._thread = None
-
-    def _background_soundtrack(self):
-        try:
-            while self._running:
-                playsound(self.BACKGROUND_SOUNDTRACK)
-                time.sleep(1.0)
-        except Exception as e:
-            print("Background error: {0} - {1!r}".format(type(e).__name__, e))
