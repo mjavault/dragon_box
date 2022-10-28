@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="FarmWise Labs, Inc.">
+    <title>Hawkeye</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/signin.css" rel="stylesheet">
+</head>
+<body class="text-center">
+
+<main class="form-signin">
+</main>
+
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script>
+    function status() {
+        $.ajax({
+            method: "GET", url: "api/status"
+        }).done(function (data) {
+
+        });
+    }
+
+    $(document).ready(function () {
+        status();
+        setInterval(function () {
+            status();
+        }, 1000);
+
+        $("#btnPowerOff").click(function () {
+            $.ajax({
+                method: "POST",
+                url: "api/poweroff"
+            });
+        });
+        $("#btnUpload").click(function () {
+            $.ajax({
+                method: "GET",
+                url: "api/upload"
+            });
+        });
+    });
+</script>
+</body>
+</html>
