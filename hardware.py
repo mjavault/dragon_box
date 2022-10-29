@@ -15,7 +15,7 @@ COLOR_FLICKER = (255, 70, 0)
 
 class Hardware:
     ANIMATION_SEQUENCE = [
-        Event(0.00, Event.SOUND, {'file': 'audio/wolf.mp3'}),
+        Event(0.00, Event.SOUND, {'file': 'audio/wolf.ogg'}),
         Event(0.0, Event.LEDS, {'mode': LedStrip.MODE_ON, 'color': COLOR_ALERT}),
         Event(0.55, Event.GPIO, {'device': 'lid', 'value': 'on'}),
         Event(0.65, Event.GPIO, {'device': 'lid', 'value': 'off'}),
@@ -74,7 +74,7 @@ class Hardware:
         Event(6.0, Event.GPIO, {'device': 'lid', 'value': 'off'}),
         Event(7.0, Event.LEDS, {'mode': LedStrip.MODE_FLICKER, 'color': COLOR_FLICKER}),
     ]
-    BACKGROUND_SOUNDTRACK = 'audio/background.mp3'
+    BACKGROUND_SOUNDTRACK = 'audio/background.ogg'
 
     def __init__(self):
         self._running = False
@@ -96,9 +96,9 @@ class Hardware:
         self.leds.set_mode(LedStrip.MODE_FLICKER, COLOR_FLICKER)
         self.leds.start()
         # background soundtrack
-        pygame.mixer.init()
+        pygame.mixer.init(buffer=2048)
         pygame.mixer.music.load(self.BACKGROUND_SOUNDTRACK)
-        pygame.mixer.music.play()  # this is a non-blocking call
+        pygame.mixer.music.play(loops=-1)  # this is a non-blocking call
 
     def stop(self):
         self._running = False
@@ -143,7 +143,8 @@ class Hardware:
                         else:
                             gpio.off()
                 elif e.action == Event.SOUND:
-                    pygame.mixer.Channel(0).play(pygame.mixer.Sound(e.data['file']))
+                    sound = pygame.mixer.Sound(e.data['file'])
+                    sound.play()
                 elif e.action == Event.LEDS:
                     self.leds.set_mode(e.data['mode'], e.data['color'])
         except Exception as e:
