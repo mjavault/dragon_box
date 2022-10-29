@@ -62,6 +62,12 @@ def api_led():
     return jsonify({"status": "ok"})
 
 
+@app.route("/api/animation/trigger", methods=["POST"])
+def api_animation_trigger(device):
+    hardware.animate()
+    return jsonify({"status": "ok"})
+
+
 def on_exit():
     hardware.stop()
 

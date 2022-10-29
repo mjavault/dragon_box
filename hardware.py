@@ -101,13 +101,19 @@ class Hardware:
 
     def _alert(self):
         print("Motion detected")
-        if self._motion_enabled and len(self._animations) > 0:
-            self.play_sequence(random.choice(self._animations))
+        if self._motion_enabled:
+            self.animate()
         else:
             print("... motion is disabled")
 
     def _rearmed(self):
         print("Rearmed")
+
+    def animate(self):
+        if len(self._animations) > 0:
+            self.play_sequence(random.choice(self._animations))
+        else:
+            print("... no animation available")
 
     def _run_sequence(self, sequence):
         print("Sequence started")
