@@ -15,8 +15,8 @@ COLOR_FLICKER = (255, 70, 0)
 
 class Hardware:
     ANIMATION_SEQUENCE = [
-        Event(0.00, Event.SOUND, {'file': 'audio/wolf.ogg'}),
-        Event(0.0, Event.LEDS, {'mode': LedStrip.MODE_ON, 'color': COLOR_ALERT}),
+        Event(0.00, Event.SOUND, {'file': 'audio/wolf.ogg', 'resync': True}),
+        Event(0.00, Event.LEDS, {'mode': LedStrip.MODE_ON, 'color': COLOR_ALERT}),
         Event(0.55, Event.GPIO, {'device': 'lid', 'value': 'on'}),
         Event(0.65, Event.GPIO, {'device': 'lid', 'value': 'off'}),
         Event(0.80, Event.GPIO, {'device': 'lid', 'value': 'on'}),
@@ -54,6 +54,16 @@ class Hardware:
         Event(9.10, Event.GPIO, {'device': 'box', 'value': 'off'}),
         Event(9.30, Event.GPIO, {'device': 'box', 'value': 'on'}),
         Event(9.50, Event.GPIO, {'device': 'box', 'value': 'off'}),
+        # last bark
+        Event(9.90, Event.GPIO, {'device': 'lid', 'value': 'on'}),
+        Event(10.00, Event.GPIO, {'device': 'lid', 'value': 'off'}),
+        Event(10.14, Event.GPIO, {'device': 'lid', 'value': 'on'}),
+        Event(10.30, Event.GPIO, {'device': 'lid', 'value': 'off'}),
+        # growls
+        Event(11.95, Event.GPIO, {'device': 'box', 'value': 'on'}),
+        Event(12.15, Event.GPIO, {'device': 'box', 'value': 'off'}),
+        # end
+        Event(19.00, Event.LEDS, {'mode': LedStrip.MODE_FLICKER, 'color': COLOR_FLICKER}),
     ]
 
     ANIMATION_SEQUENCE_OLD = [
@@ -96,7 +106,7 @@ class Hardware:
         self.leds.set_mode(LedStrip.MODE_FLICKER, COLOR_FLICKER)
         self.leds.start()
         # background soundtrack
-        pygame.mixer.init(buffer=2048)
+        pygame.mixer.init(buffer=512)
         pygame.mixer.music.load(self.BACKGROUND_SOUNDTRACK)
         pygame.mixer.music.play(loops=-1)  # this is a non-blocking call
 
@@ -145,6 +155,9 @@ class Hardware:
                 elif e.action == Event.SOUND:
                     sound = pygame.mixer.Sound(e.data['file'])
                     sound.play()
+                    if e.data['resync']:
+                        # resynchronize the loop time with moment the audio file started playing
+                        start_time = time.time() - e.time
                 elif e.action == Event.LEDS:
                     self.leds.set_mode(e.data['mode'], e.data['color'])
         except Exception as e:
