@@ -63,7 +63,7 @@ def api_led():
 
 
 @app.route("/api/animation/trigger", methods=["POST"])
-def api_animation_trigger(device):
+def api_animation_trigger():
     hardware.animate()
     return jsonify({"status": "ok"})
 
