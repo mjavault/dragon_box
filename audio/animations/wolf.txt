@@ -1,0 +1,53 @@
+0.00, SOUND, audio/animations/wolf.ogg, True
+0.00, LEDS, MODE_ON, 0/255/0
+# 1st bark
+0.55, GPIO, fog, True
+0.55, GPIO, lid, True
+0.65, GPIO, lid, False
+0.80, GPIO, lid, True
+1.00, GPIO, lid, False
+1.16, GPIO, box, True
+1.36, GPIO, box, False
+1.56, GPIO, box, True
+1.76, GPIO, box, False
+1.95, GPIO, lid, True
+2.15, GPIO, lid, False
+2.15, GPIO, fog, False
+# growls
+2.85, GPIO, box, True
+2.95, GPIO, box, False
+3.05, GPIO, box, True
+3.15, GPIO, box, False
+3.25, GPIO, box, True
+3.35, GPIO, box, False
+# 2nd (large) bark
+4.95, GPIO, lid, True
+5.00, GPIO, box, True
+5.10, GPIO, lid, False
+5.15, GPIO, box, False
+5.28, GPIO, lid, True
+5.52, GPIO, lid, False
+5.52, GPIO, box, True
+5.72, GPIO, box, False
+# 3rd bark
+5.85, GPIO, lid, True
+6.00, GPIO, lid, False
+# 4th bark
+7.58, GPIO, fog, True
+7.58, GPIO, lid, True
+7.88, GPIO, lid, False
+8.50, GPIO, box, True
+8.70, GPIO, box, False
+8.90, GPIO, box, True
+9.10, GPIO, box, False
+9.30, GPIO, box, True
+9.50, GPIO, box, False
+9.50, GPIO, fog, False
+# last bark
+9.90, GPIO, lid, True
+10.00, GPIO, lid, False
+10.14, GPIO, lid, True
+10.30, GPIO, lid, False
+# growls
+11.95, GPIO, box, True
+12.15, GPIO, box, False
