@@ -17,6 +17,8 @@ class Hardware:
     ANIMATION_SEQUENCE = [
         Event(0.00, Event.SOUND, {'file': 'audio/wolf.ogg', 'resync': True}),
         Event(0.00, Event.LEDS, {'mode': LedStrip.MODE_ON, 'color': COLOR_ALERT}),
+        # 1st bark
+        Event(0.55, Event.GPIO, {'device': 'fog', 'value': 'on'}),
         Event(0.55, Event.GPIO, {'device': 'lid', 'value': 'on'}),
         Event(0.65, Event.GPIO, {'device': 'lid', 'value': 'off'}),
         Event(0.80, Event.GPIO, {'device': 'lid', 'value': 'on'}),
@@ -27,6 +29,8 @@ class Hardware:
         Event(1.76, Event.GPIO, {'device': 'box', 'value': 'off'}),
         Event(1.95, Event.GPIO, {'device': 'lid', 'value': 'on'}),
         Event(2.15, Event.GPIO, {'device': 'lid', 'value': 'off'}),
+        Event(2.15, Event.GPIO, {'device': 'fog', 'value': 'off'}),
+        # growls
         Event(2.85, Event.GPIO, {'device': 'box', 'value': 'on'}),
         Event(2.95, Event.GPIO, {'device': 'box', 'value': 'off'}),
         Event(3.05, Event.GPIO, {'device': 'box', 'value': 'on'}),
@@ -46,6 +50,7 @@ class Hardware:
         Event(5.85, Event.GPIO, {'device': 'lid', 'value': 'on'}),
         Event(6.00, Event.GPIO, {'device': 'lid', 'value': 'off'}),
         # 4th bark
+        Event(7.58, Event.GPIO, {'device': 'fog', 'value': 'on'}),
         Event(7.58, Event.GPIO, {'device': 'lid', 'value': 'on'}),
         Event(7.88, Event.GPIO, {'device': 'lid', 'value': 'off'}),
         Event(8.50, Event.GPIO, {'device': 'box', 'value': 'on'}),
@@ -54,6 +59,7 @@ class Hardware:
         Event(9.10, Event.GPIO, {'device': 'box', 'value': 'off'}),
         Event(9.30, Event.GPIO, {'device': 'box', 'value': 'on'}),
         Event(9.50, Event.GPIO, {'device': 'box', 'value': 'off'}),
+        Event(9.50, Event.GPIO, {'device': 'fog', 'value': 'off'}),
         # last bark
         Event(9.90, Event.GPIO, {'device': 'lid', 'value': 'on'}),
         Event(10.00, Event.GPIO, {'device': 'lid', 'value': 'off'}),
@@ -98,6 +104,10 @@ class Hardware:
         self.fog = LED(26)
         # Led strip
         self.leds = LedStrip()
+        # Default options
+        self._motion_enabled = True
+        self._music_enabled = True
+        self._fog_enabled = True
 
     def start(self):
         self._running = True
@@ -108,7 +118,13 @@ class Hardware:
         # background soundtrack
         pygame.mixer.init(buffer=512)
         pygame.mixer.music.load(self.BACKGROUND_SOUNDTRACK)
-        pygame.mixer.music.play(loops=-1)  # this is a non-blocking call
+        self._start_background_music()
+
+    def _start_background_music(self):
+        pygame.mixer.music.play(loops=-1)
+
+    def _stop_background_music(self):
+        pygame.mixer.music.stop()
 
     def stop(self):
         self._running = False
@@ -119,7 +135,7 @@ class Hardware:
             self._thread = Thread(target=self._run_sequence, args=(sequence,), daemon=True)
             self._thread.start()
         else:
-            print("- previous sequence still running")
+            print("... previous sequence still running")
 
     def set_gpio(self, device, on):
         gpio = None
@@ -137,7 +153,10 @@ class Hardware:
 
     def _alert(self):
         print("Motion detected")
-        self.play_sequence(self.ANIMATION_SEQUENCE)
+        if self._motion_enabled:
+            self.play_sequence(self.ANIMATION_SEQUENCE)
+        else:
+            print("... motion is disabled")
 
     def _rearmed(self):
         print("Rearmed")
@@ -166,3 +185,29 @@ class Hardware:
             print("Animation error: {0} - {1!r}".format(type(e).__name__, e))
         print("Sequence complete")
         self._thread = None
+
+    def is_fog_enabled(self):
+        return self._fog_enabled
+
+    def set_fog_enabled(self, enabled):
+        self._fog_enabled = enabled
+        if not enabled:
+            self.set_gpio("fog", False)
+
+    def is_motion_enabled(self):
+        return self._motion_enabled
+
+    def set_motion_enabled(self, enabled):
+        self._motion_enabled = enabled
+
+    def is_music_enabled(self):
+        return self._music_enabled
+
+    def set_music_enabled(self, enabled):
+        if enabled and not self._music_enabled:
+            print("Starting background music")
+            self._start_background_music()
+        elif not enabled and self._music_enabled:
+            print("Stopping background music")
+            self._stop_background_music()
+        self._music_enabled = enabled

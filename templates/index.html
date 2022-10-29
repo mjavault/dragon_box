@@ -4,14 +4,27 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="FarmWise Labs, Inc.">
-    <title>Hawkeye</title>
+    <meta name="author" content="Michael Javault">
+    <title>Halloween Dragon Box</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/signin.css" rel="stylesheet">
 </head>
 <body class="text-center">
 
 <main class="form-signin">
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="chkFogEnabled">
+        <label class="form-check-label" for="chkFogEnabled">Fog enabled</label>
+    </div>
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="chkMusicEnabled">
+        <label class="form-check-label" for="chkMusicEnabled">Background music enabled</label>
+    </div>
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="chkMotionEnabled">
+        <label class="form-check-label" for="chkMotionEnabled">Motion detection enabled</label>
+    </div>
+
     <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnLid">Lid</button>
     <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnBox">Box</button>
     <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnFog">Fog</button>
@@ -20,21 +33,33 @@
 <script src="js/bootstrap.bundle.min.js"></script>
 <script src="js/jquery-3.2.1.min.js"></script>
 <script>
+    function gpio(device, action) {
+        $.ajax({method: "POST", url: `api/gpio/${device}/${action}`});
+    }
+
+    function refreshOptions() {
+        $.ajax({
+            method: "GET", url: `api/options`,
+        }).done(function (data) {
+            $("#chkFogEnabled").prop("checked", data.fog);
+            $("#chkMusicEnabled").prop("checked", data.music);
+            $("#chkMotionEnabled").prop("checked", data.motion);
+        });
+    }
+
     $(document).ready(function () {
-        $("#btnLid").on('mousedown', () => {
-            $.ajax({method: "POST", url: "api/gpio/lid/on"});
-        }).on('mouseup', () => {
-            $.ajax({method: "POST", url: "api/gpio/lid/off"});
-        });
-        $("#btnBox").on('mousedown', () => {
-            $.ajax({method: "POST", url: "api/gpio/box/on"});
-        }).on('mouseup', () => {
-            $.ajax({method: "POST", url: "api/gpio/box/off"});
-        });
-        $("#btnFog").on('mousedown', () => {
-            $.ajax({method: "POST", url: "api/gpio/fog/on"});
-        }).on('mouseup', () => {
-            $.ajax({method: "POST", url: "api/gpio/fog/off"});
+        refreshOptions();
+        $("#btnLid").on('mousedown', () => gpio("lid", "on")).on('mouseup', () => gpio("lid", "off"));
+        $("#btnBox").on('mousedown', () => gpio("box", "on")).on('mouseup', () => gpio("box", "off"));
+        $("#btnFog").on('mousedown', () => gpio("fog", "on")).on('mouseup', () => gpio("fog", "off"));
+        $('#chkFogEnabled, #chkMusicEnabled, #chkMotionEnabled').change(function () {
+            $.ajax({
+                method: "POST", url: `api/options`, data: {
+                    fog: $("#chkFogEnabled").is(":checked"),
+                    music: $("#chkMusicEnabled").is(":checked"),
+                    motion: $("#chkMotionEnabled").is(":checked")
+                }
+            });
         });
     });
 </script>

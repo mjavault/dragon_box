@@ -23,9 +23,20 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/api/status")
-def api_status():
-    status = {}
+@app.route("/api/options", methods=["GET", "POST"])
+def api_options():
+    if request.method == "POST":
+        fog_enabled = request.form["fog"]
+        music_enabled = request.form["music"]
+        motion_enabled = request.form["motion"]
+        hardware.set_fog_enabled(fog_enabled)
+        hardware.set_music_enabled(music_enabled)
+        hardware.set_motion_enabled(motion_enabled)
+    status = {
+        "fog": hardware.is_fog_enabled(),
+        "music": hardware.is_music_enabled(),
+        "motion": hardware.is_motion_enabled()
+    }
     return jsonify(status)
 
 
