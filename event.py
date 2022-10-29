@@ -31,7 +31,7 @@ class Event:
                 mode = Event._parse_leds_mode(fields[2])
                 data = {
                     'mode': mode,
-                    'color': fields[3] == "True",
+                    'color': Event._parse_color(fields[3])
                 }
             else:
                 data = {}
