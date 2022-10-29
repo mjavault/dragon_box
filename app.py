@@ -4,6 +4,7 @@ from flask import (
     Flask,
     jsonify,
     render_template,
+    request,
 )
 
 from hardware import Hardware
@@ -28,13 +29,25 @@ def api_status():
     return jsonify(status)
 
 
-@app.route("/api/test1", methods=["POST"])
-def api_test1():
+@app.route("/api/gpio/<device>/on", methods=["POST"])
+def api_gpio_on(device):
+    hardware.set_gpio(device, True)
     return jsonify({"status": "ok"})
 
 
-@app.route("/api/test2")
-def api_test2():
+@app.route("/api/gpio/<device>/off", methods=["POST"])
+def api_gpio_off(device):
+    hardware.set_gpio(device, False)
+    return jsonify({"status": "ok"})
+
+
+@app.route("/api/led")
+def api_led():
+    mode = int(request.form["mode"])
+    r = request.form["r"]
+    g = request.form["g"]
+    b = request.form["b"]
+    hardware.leds.set_mode(mode, (r, g, b))
     return jsonify({"status": "ok"})
 
 

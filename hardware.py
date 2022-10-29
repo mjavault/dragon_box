@@ -121,6 +121,20 @@ class Hardware:
         else:
             print("- previous sequence still running")
 
+    def set_gpio(self, device, on):
+        gpio = None
+        if device == 'box':
+            gpio = self.box
+        elif device == 'lid':
+            gpio = self.lid
+        elif device == 'fog':
+            gpio = self.fog
+        if gpio is not None:
+            if on:
+                gpio.on()
+            else:
+                gpio.off()
+
     def _alert(self):
         print("Motion detected")
         self.play_sequence(self.ANIMATION_SEQUENCE)
@@ -138,20 +152,8 @@ class Hardware:
                 delay = e.time - (time.time() - start_time)
                 if delay > 0:
                     time.sleep(delay)
-                last_event_time = e.time
                 if e.action == Event.GPIO:
-                    gpio = None
-                    if e.data['device'] == 'box':
-                        gpio = self.box
-                    elif e.data['device'] == 'lid':
-                        gpio = self.lid
-                    elif e.data['device'] == 'fog':
-                        gpio = self.fog
-                    if gpio is not None:
-                        if e.data['value'] == 'on':
-                            gpio.on()
-                        else:
-                            gpio.off()
+                    self.set_gpio(e.data['device'], e.data['value'] == 'on')
                 elif e.action == Event.SOUND:
                     sound = pygame.mixer.Sound(e.data['file'])
                     sound.play()

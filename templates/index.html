@@ -12,36 +12,29 @@
 <body class="text-center">
 
 <main class="form-signin">
+    <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnLid">Lid</button>
+    <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnBox">Box</button>
+    <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnFog">Fog</button>
 </main>
 
 <script src="js/bootstrap.bundle.min.js"></script>
 <script src="js/jquery-3.2.1.min.js"></script>
 <script>
-    function status() {
-        $.ajax({
-            method: "GET", url: "api/status"
-        }).done(function (data) {
-
-        });
-    }
-
     $(document).ready(function () {
-        status();
-        setInterval(function () {
-            status();
-        }, 1000);
-
-        $("#btnPowerOff").click(function () {
-            $.ajax({
-                method: "POST",
-                url: "api/poweroff"
-            });
+        $("#btnLid").on('mousedown', () => {
+            $.ajax({method: "POST", url: "api/gpio/lid/on"});
+        }).on('mouseup', () => {
+            $.ajax({method: "POST", url: "api/gpio/lid/off"});
         });
-        $("#btnUpload").click(function () {
-            $.ajax({
-                method: "GET",
-                url: "api/upload"
-            });
+        $("#btnBox").on('mousedown', () => {
+            $.ajax({method: "POST", url: "api/gpio/box/on"});
+        }).on('mouseup', () => {
+            $.ajax({method: "POST", url: "api/gpio/box/off"});
+        });
+        $("#btnFog").on('mousedown', () => {
+            $.ajax({method: "POST", url: "api/gpio/fog/on"});
+        }).on('mouseup', () => {
+            $.ajax({method: "POST", url: "api/gpio/fog/off"});
         });
     });
 </script>
