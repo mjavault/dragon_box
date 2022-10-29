@@ -52,7 +52,7 @@ class Hardware:
         for path in os.listdir(ambient_path):
             if path.endswith(".ogg"):
                 self._background_music.append(os.path.join(ambient_path, path))
-        print(f"{len(self._background_music)} ambient music files loaded")
+        print("{0} ambient music files loaded".format(len(self._background_music)))
 
         # Load animations
         for path in os.listdir(animations_path):
@@ -64,7 +64,7 @@ class Hardware:
                         e = Event.parse(line)
                         animation.append(e)
                 self._animations.append(animation)
-        print(f"{len(self._animations)} animations loaded")
+        print("{0} animations loaded".format(len(self._animations)))
 
     def _start_background_music(self):
         if len(self._background_music) > 0:

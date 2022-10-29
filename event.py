@@ -37,7 +37,7 @@ class Event:
                 data = {}
             return Event(time, action, data)
         except Exception as e:
-            print(f"Invalid line in animation: {line} -> {e}")
+            print("Invalid line in animation: {0} -> {1}".format(line, e))
             return None
 
     @staticmethod
@@ -53,7 +53,7 @@ class Event:
             elif s == "LEDS":
                 action = Event.LEDS
             else:
-                raise Exception(f"Invalid action: {s}")
+                raise Exception("Invalid action: {0}".format(s))
         return action
 
     @staticmethod
@@ -71,7 +71,7 @@ class Event:
             elif s == "MODE_RAINBOW":
                 mode = LedStrip.MODE_RAINBOW
             else:
-                raise Exception(f"Invalid LEDs mode: {s}")
+                raise Exception("Invalid LEDs mode: {0}".format(s))
         return mode
 
     @staticmethod
