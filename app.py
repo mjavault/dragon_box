@@ -26,9 +26,9 @@ def index():
 @app.route("/api/options", methods=["GET", "POST"])
 def api_options():
     if request.method == "POST":
-        fog_enabled = request.form["fog"]
-        music_enabled = request.form["music"]
-        motion_enabled = request.form["motion"]
+        fog_enabled = request.form["fog"] == 'true'
+        music_enabled = request.form["music"] == 'true'
+        motion_enabled = request.form["motion"] == 'true'
         hardware.set_fog_enabled(fog_enabled)
         hardware.set_music_enabled(music_enabled)
         hardware.set_motion_enabled(motion_enabled)
