@@ -24,6 +24,10 @@
         <input class="form-check-input" type="checkbox" role="switch" id="chkMotionEnabled">
         <label class="form-check-label" for="chkMotionEnabled">Motion detection enabled</label>
     </div>
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="chkIdleEnabled">
+        <label class="form-check-label" for="chkIdleEnabled">Idle animations enabled</label>
+    </div>
 
     <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnLid">Lid</button>
     <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnBox">Box</button>
@@ -49,6 +53,7 @@
             $("#chkFogEnabled").prop("checked", data.fog);
             $("#chkMusicEnabled").prop("checked", data.music);
             $("#chkMotionEnabled").prop("checked", data.motion);
+            $("#chkIdleEnabled").prop("checked", data.idle);
         });
     }
 
@@ -74,7 +79,8 @@
                 method: "POST", url: `api/options`, data: {
                     fog: $("#chkFogEnabled").is(":checked"),
                     music: $("#chkMusicEnabled").is(":checked"),
-                    motion: $("#chkMotionEnabled").is(":checked")
+                    motion: $("#chkMotionEnabled").is(":checked"),
+                    idle: $("#chkIdleEnabled").is(":checked")
                 }
             });
         });

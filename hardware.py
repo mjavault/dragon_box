@@ -22,7 +22,9 @@ class Hardware:
         # Animations
         self._background_music = []
         self._animations = {}
+        self._idle_animations = []
         self._load_animations()
+        self._last_animation_time = time.time()
         # Motion sensor
         self.pir = MotionSensor(4)
         # Valves actuators
@@ -36,6 +38,7 @@ class Hardware:
         self._motion_enabled = True
         self._music_enabled = True
         self._fog_enabled = True
+        self._idle_enabled = True
 
     def start(self):
         self._running = True
@@ -46,6 +49,9 @@ class Hardware:
         # background soundtrack
         pygame.mixer.init(buffer=512)
         self._start_background_music()
+        # idle animations
+        thread = Thread(target=self._watchdog, daemon=True)
+        thread.start()
 
     def _load_animations(self, ambient_path="audio/ambient/", animations_path="audio/animations/"):
         # Load ambient music files
@@ -57,13 +63,19 @@ class Hardware:
         # Load animations
         for path in os.listdir(animations_path):
             if path.endswith(".txt"):
+                category = None
                 animation = []
                 file = open(os.path.join(animations_path, path), 'r')
                 for line in file.readlines():
-                    if not line.startswith("#"):
+                    if line.startswith("#!"):
+                        category = line[2:].strip()
+                    elif not line.startswith("#"):
                         e = Event.parse(line)
                         animation.append(e)
-                self._animations[path] = animation
+                if category != "DISABLED":
+                    self._animations[path] = animation
+                    if category == "IDLE":
+                        self._idle_animations.append(animation)
         print("{0} animations loaded".format(len(self._animations)))
 
     def _start_background_music(self):
@@ -127,6 +139,7 @@ class Hardware:
     def _run_sequence(self, sequence):
         print("Sequence started")
         try:
+            self._last_animation_time = time.time()
             # store led state
             leds_previous_mode = self.leds.mode
             leds_previous_color = self.leds.color.rgb
@@ -169,6 +182,12 @@ class Hardware:
     def set_motion_enabled(self, enabled):
         self._motion_enabled = enabled
 
+    def is_idle_enabled(self):
+        return self._idle_enabled
+
+    def set_idle_enabled(self, enabled):
+        self._idle_enabled = enabled
+
     def is_music_enabled(self):
         return self._music_enabled
 
@@ -180,3 +199,11 @@ class Hardware:
             print("Stopping background music")
             self._stop_background_music()
         self._music_enabled = enabled
+
+    def _watchdog(self):
+        while self._running:
+            if self._idle_enabled and len(self._idle_animations) > 0:
+                if time.time() - self._last_animation_time > 5 * 60:
+                    animation = random.choice(self._idle_animations)
+                    self.animate(animation)
+            time.sleep(5.0)

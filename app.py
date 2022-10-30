@@ -29,13 +29,16 @@ def api_options():
         fog_enabled = request.form["fog"] == 'true'
         music_enabled = request.form["music"] == 'true'
         motion_enabled = request.form["motion"] == 'true'
+        idle_enabled = request.form["idle"] == 'true'
         hardware.set_fog_enabled(fog_enabled)
         hardware.set_music_enabled(music_enabled)
         hardware.set_motion_enabled(motion_enabled)
+        hardware.set_idle_enabled(idle_enabled)
     status = {
         "fog": hardware.is_fog_enabled(),
         "music": hardware.is_music_enabled(),
-        "motion": hardware.is_motion_enabled()
+        "motion": hardware.is_motion_enabled(),
+        "idle": hardware.is_idle_enabled()
     }
     return jsonify(status)
 
