@@ -104,7 +104,8 @@ class Hardware:
         elif device == 'lid':
             gpio = self.lid
         elif device == 'fog':
-            gpio = self.fog
+            if not on or self._fog_enabled:
+                gpio = self.fog
         if gpio is not None:
             if on:
                 gpio.on()
@@ -204,6 +205,7 @@ class Hardware:
         while self._running:
             if self._idle_enabled and len(self._idle_animations) > 0:
                 if time.time() - self._last_animation_time > 5 * 60:
+                    print("Idle triggered")
                     animation = random.choice(self._idle_animations)
                     self.animate(animation)
             time.sleep(5.0)

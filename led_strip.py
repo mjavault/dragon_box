@@ -70,5 +70,5 @@ class LedStrip:
                 self.dots.show()
                 time.sleep(0.02)
             else:
-                self._write_color((0, 0, 0))
+                self._write_color(Color((0, 0, 0)))
                 time.sleep(.25)
