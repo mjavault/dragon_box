@@ -14,30 +14,31 @@ class Event:
     @staticmethod
     def parse(line):
         try:
-            fields = list(map(lambda x: x.strip(), line.split(",")))
-            time = float(fields[0])
-            action = Event._parse_action(fields[1])
-            if action == Event.GPIO:
-                data = {
-                    'device': fields[2],
-                    'value': fields[3] == "True",
-                }
-            elif action == Event.SOUND:
-                data = {
-                    'file': fields[2],
-                    'resync': fields[3] == "True",
-                }
-            elif action == Event.LEDS:
-                mode = Event._parse_leds_mode(fields[2])
-                data = {
-                    'mode': mode,
-                    'color': Event._parse_color(fields[3])
-                }
-            else:
-                data = {}
-            return Event(time, action, data)
+            if not line.startswith("#") and len(line.strip()) > 0:
+                fields = list(map(lambda x: x.strip(), line.split(",")))
+                time = float(fields[0])
+                action = Event._parse_action(fields[1])
+                if action == Event.GPIO:
+                    data = {
+                        'device': fields[2],
+                        'value': fields[3] == "True",
+                    }
+                elif action == Event.SOUND:
+                    data = {
+                        'file': fields[2],
+                        'resync': fields[3] == "True",
+                    }
+                elif action == Event.LEDS:
+                    mode = Event._parse_leds_mode(fields[2])
+                    data = {
+                        'mode': mode,
+                        'color': Event._parse_color(fields[3])
+                    }
+                else:
+                    data = {}
+                return Event(time, action, data)
         except Exception as e:
-            print("Invalid line in animation: {0} -> {1}".format(line, e))
+            print("Invalid line in animation: [{0}] -> {1}".format(line, e))
             return None
 
     @staticmethod
