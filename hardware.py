@@ -208,5 +208,5 @@ class Hardware:
                 if time.time() - self._last_animation_time > 5 * 60:
                     print("Idle triggered")
                     animation = random.choice(self._idle_animations)
-                    self.animate(animation)
+                    self.play_sequence(animation)
             time.sleep(5.0)
