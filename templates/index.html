@@ -84,6 +84,23 @@
                 }
             });
         });
+        $(document).keydown((e) => {
+            if (e.key === 'b') {
+                gpio("box", "on");
+            } else if (e.key === 'l') {
+                gpio("lid", "on");
+            } else if (e.key === 'f') {
+                gpio("fog", "on");
+            }
+        }).keyup((e) => {
+            if (e.key === 'b') {
+                gpio("box", "off");
+            } else if (e.key === 'l') {
+                gpio("lid", "off");
+            } else if (e.key === 'f') {
+                gpio("fog", "off");
+            }
+        });
     });
 </script>
 </body>

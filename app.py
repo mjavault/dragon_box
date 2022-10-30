@@ -68,6 +68,8 @@ def api_led():
 @app.route("/api/animation/trigger", methods=["POST"])
 def api_animation_trigger():
     name = request.form.get("name")
+    if len(name.strip()) == 0:
+        name = None
     hardware.animate(name)
     return jsonify({"status": "ok"})
 
