@@ -1,4 +1,0 @@
-0.00, GPIO, fog, True
-5.00, GPIO, fog, False
-5.00, GPIO, lid, True
-15.00, GPIO, lid, False

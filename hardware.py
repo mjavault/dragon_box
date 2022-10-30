@@ -21,7 +21,7 @@ class Hardware:
         self._thread = None
         # Animations
         self._background_music = []
-        self._animations = []
+        self._animations = {}
         self._load_animations()
         # Motion sensor
         self.pir = MotionSensor(4)
@@ -63,7 +63,7 @@ class Hardware:
                     if not line.startswith("#"):
                         e = Event.parse(line)
                         animation.append(e)
-                self._animations.append(animation)
+                self._animations[path] = animation
         print("{0} animations loaded".format(len(self._animations)))
 
     def _start_background_music(self):
@@ -109,9 +109,18 @@ class Hardware:
     def _rearmed(self):
         print("Rearmed")
 
-    def animate(self):
-        if len(self._animations) > 0:
-            self.play_sequence(random.choice(self._animations))
+    def animate(self, name=None):
+        if name is not None:
+            animation = self._animations.get(name)
+            if animation is not None:
+                print("... playing animation {0}".format(name))
+                self.play_sequence(animation)
+            else:
+                print("... animation {0} not found".format(name))
+        elif len(self._animations) > 0:
+            animation = random.choice(list(self._animations.items()))
+            print("... playing animation {0} (random)".format(animation[0]))
+            self.play_sequence(animation[1])
         else:
             print("... no animation available")
 
@@ -130,7 +139,7 @@ class Hardware:
                 if delay > 0:
                     time.sleep(delay)
                 if e.action == Event.GPIO:
-                    self.set_gpio(e.data['device'], e.data['value'] or e.data['value'] == 'on')
+                    self.set_gpio(e.data['device'], e.data['value'])
                 elif e.action == Event.SOUND:
                     sound = pygame.mixer.Sound(e.data['file'])
                     sound.play()
