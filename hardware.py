@@ -71,7 +71,8 @@ class Hardware:
                         category = line[2:].strip()
                     elif not line.startswith("#"):
                         e = Event.parse(line)
-                        animation.append(e)
+                        if e is not None:
+                            animation.append(e)
                 if category != "DISABLED":
                     self._animations[path] = animation
                     if category == "IDLE":
