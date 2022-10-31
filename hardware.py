@@ -39,6 +39,7 @@ class Hardware:
         self._music_enabled = True
         self._fog_enabled = True
         self._idle_enabled = True
+        self._min_pause_time = 10.0  # seconds
 
     def start(self):
         self._running = True
@@ -116,7 +117,10 @@ class Hardware:
     def _alert(self):
         print("Motion detected")
         if self._motion_enabled:
-            self.animate()
+            if time.time() - self._last_animation_time > self._min_pause_time:
+                self.animate()
+            else:
+                print("... motion is paused")
         else:
             print("... motion is disabled")
 
@@ -141,6 +145,7 @@ class Hardware:
     def _run_sequence(self, sequence):
         print("Sequence started")
         try:
+            # update the last animation time now, and then again once the animation is complete
             self._last_animation_time = time.time()
             # store led state
             leds_previous_mode = self.leds.mode
@@ -165,6 +170,7 @@ class Hardware:
                     self.leds.set_mode(e.data['mode'], e.data['color'])
             # restore previous led state
             self.leds.set_mode(leds_previous_mode, leds_previous_color)
+            self._last_animation_time = time.time()
         except Exception as e:
             print("Animation error: {0} - {1!r}".format(type(e).__name__, e))
         print("Sequence complete")
