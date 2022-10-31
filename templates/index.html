@@ -64,7 +64,7 @@
         }).done(function (data) {
             if (data && data.animations) {
                 const $animations = $("#slAnimation");
-                $.each(data.animations, function (e) {
+                $.each(data.animations, function (i, e) {
                     $animations.append(`<option value="${e}">${e}</option>`);
                 });
             }
