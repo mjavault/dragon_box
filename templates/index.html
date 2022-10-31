@@ -33,8 +33,9 @@
     <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnBox">Box</button>
     <button class="mt-4 w-100 btn btn-lg btn-outline-primary" id="btnFog">Fog</button>
     <div class="input-group mt-4">
-        <input type="text" class="form-control" placeholder="Random animation" aria-label="Random animation"
-               aria-describedby="btnAnimate" id="txtAnimationName">
+        <select class="form-select" id="slAnimation" aria-label="Animation">
+            <option selected>Random</option>
+        </select>
         <button class="btn btn-outline-primary" type="button" id="btnAnimate">Animate</button>
     </div>
 </main>
@@ -57,21 +58,29 @@
         });
     }
 
+    function refreshAnimations() {
+        $.ajax({
+            method: "GET", url: `api/animations`,
+        }).done(function (data) {
+            if (data && data.animations) {
+                const $animations = $("#slAnimation");
+                $.each(data.animations, function (e) {
+                    $animations.append(`<option value="${e.name}">${e.name} (${e.category})</option>`);
+                });
+            }
+        });
+    }
+
     $(document).ready(function () {
         refreshOptions();
         $("#btnLid").on('mousedown', () => gpio("lid", "on")).on('mouseup', () => gpio("lid", "off"));
         $("#btnBox").on('mousedown', () => gpio("box", "on")).on('mouseup', () => gpio("box", "off"));
         $("#btnFog").on('mousedown', () => gpio("fog", "on")).on('mouseup', () => gpio("fog", "off"));
-        $("#txtAnimationName").keyup(function (e) {
-            if (e.keyCode === 13) {
-                $("#btnAnimate").trigger("click");
-            }
-        });
         $("#btnAnimate").on('click', () => $.ajax({
             method: "POST",
             url: 'api/animation/trigger',
             data: {
-                name: $("#txtAnimationName").val() || null
+                name: $("#slAnimation").val() || null
             }
         }));
         $('#chkFogEnabled, #chkMusicEnabled, #chkMotionEnabled').change(function () {

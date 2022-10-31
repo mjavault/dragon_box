@@ -26,14 +26,18 @@ def index():
 @app.route("/api/options", methods=["GET", "POST"])
 def api_options():
     if request.method == "POST":
-        fog_enabled = request.form["fog"] == 'true'
-        music_enabled = request.form["music"] == 'true'
-        motion_enabled = request.form["motion"] == 'true'
-        idle_enabled = request.form["idle"] == 'true'
-        hardware.set_fog_enabled(fog_enabled)
-        hardware.set_music_enabled(music_enabled)
-        hardware.set_motion_enabled(motion_enabled)
-        hardware.set_idle_enabled(idle_enabled)
+        fog_enabled = request.form.get("fog")
+        if fog_enabled is not None:
+            hardware.set_fog_enabled(fog_enabled == 'true')
+        music_enabled = request.form.get("music")
+        if music_enabled is not None:
+            hardware.set_music_enabled(music_enabled == 'true')
+        motion_enabled = request.form.get("motion")
+        if motion_enabled is not None:
+            hardware.set_motion_enabled(motion_enabled == 'true')
+        idle_enabled = request.form.get("idle")
+        if idle_enabled is not None:
+            hardware.set_idle_enabled(idle_enabled == 'true')
     status = {
         "fog": hardware.is_fog_enabled(),
         "music": hardware.is_music_enabled(),
@@ -63,6 +67,11 @@ def api_led():
     b = request.form["b"]
     hardware.leds.set_mode(mode, (r, g, b))
     return jsonify({"status": "ok"})
+
+
+@app.route("/api/animations")
+def api_animations_list():
+    return jsonify({"animations": hardware.animations.values()})
 
 
 @app.route("/api/animation/trigger", methods=["POST"])

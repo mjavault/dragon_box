@@ -21,8 +21,7 @@ class Hardware:
         self._thread = None
         # Animations
         self._background_music = []
-        self._animations = {}
-        self._idle_animations = []
+        self.animations = {}
         self._load_animations()
         self._last_animation_time = time.time()
         # Motion sensor
@@ -64,8 +63,8 @@ class Hardware:
         # Load animations
         for path in os.listdir(animations_path):
             if path.endswith(".txt"):
-                category = None
-                animation = []
+                category = 'DEFAULT'
+                events = []
                 file = open(os.path.join(animations_path, path), 'r')
                 for line in file.readlines():
                     if line.startswith("#!"):
@@ -73,12 +72,13 @@ class Hardware:
                     elif not line.startswith("#"):
                         e = Event.parse(line)
                         if e is not None:
-                            animation.append(e)
-                if category != "DISABLED":
-                    self._animations[path] = animation
-                    if category == "IDLE":
-                        self._idle_animations.append(animation)
-        print("{0} animations loaded".format(len(self._animations)))
+                            events.append(e)
+                self.animations[path] = {
+                    'name': path,
+                    'category': category,
+                    'events': events
+                }
+        print("{0} animations loaded".format(len(self.animations)))
 
     def _start_background_music(self):
         if len(self._background_music) > 0:
@@ -129,14 +129,17 @@ class Hardware:
 
     def animate(self, name=None):
         if name is not None:
-            animation = self._animations.get(name)
+            animation = self.animations.get(name)
             if animation is not None:
                 print("... playing animation {0}".format(name))
                 self.play_sequence(animation)
             else:
                 print("... animation {0} not found".format(name))
-        elif len(self._animations) > 0:
-            animation = random.choice(list(self._animations.items()))
+        elif len(self.animations) > 0:
+            animations = list(
+                v for k, v in self.animations.items()
+                if v.get('category') == 'DEFAULT' or v.get('category') == 'IDLE')
+            animation = random.choice(animations)
             print("... playing animation {0} (random)".format(animation[0]))
             self.play_sequence(animation[1])
         else:
@@ -210,9 +213,10 @@ class Hardware:
 
     def _watchdog(self):
         while self._running:
-            if self._idle_enabled and len(self._idle_animations) > 0:
-                if time.time() - self._last_animation_time > 5 * 60:
+            if self._idle_enabled:
+                idle_animations = list(v for k, v in self.animations.items() if v.get('category') == 'IDLE')
+                if len(idle_animations) > 0 and time.time() - self._last_animation_time > 5 * 60:
                     print("Idle triggered")
-                    animation = random.choice(self._idle_animations)
+                    animation = random.choice(idle_animations)
                     self.play_sequence(animation)
             time.sleep(5.0)
