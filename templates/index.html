@@ -65,7 +65,7 @@
             if (data && data.animations) {
                 const $animations = $("#slAnimation");
                 $.each(data.animations, function (e) {
-                    $animations.append(`<option value="${e.name}">${e.name} (${e.category})</option>`);
+                    $animations.append(`<option value="${e}">${e}</option>`);
                 });
             }
         });
@@ -84,7 +84,7 @@
                 name: $("#slAnimation").val() || null
             }
         }));
-        $('#chkFogEnabled, #chkMusicEnabled, #chkMotionEnabled').change(function () {
+        $('#chkFogEnabled, #chkMusicEnabled, #chkMotionEnabled, #chkIdleEnabled').change(function () {
             $.ajax({
                 method: "POST", url: `api/options`, data: {
                     fog: $("#chkFogEnabled").is(":checked"),
