@@ -71,7 +71,7 @@ def api_led():
 
 @app.route("/api/animations")
 def api_animations_list():
-    return jsonify({"animations": hardware.animations.values()})
+    return jsonify({"animations": hardware.animations.keys()})
 
 
 @app.route("/api/animation/trigger", methods=["POST"])
