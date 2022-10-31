@@ -132,7 +132,7 @@ class Hardware:
             animation = self.animations.get(name)
             if animation is not None:
                 print("... playing animation {0}".format(name))
-                self.play_sequence(animation)
+                self.play_sequence(animation['events'])
             else:
                 print("... animation {0} not found".format(name))
         elif len(self.animations) > 0:
@@ -140,8 +140,8 @@ class Hardware:
                 v for k, v in self.animations.items()
                 if v.get('category') == 'DEFAULT' or v.get('category') == 'IDLE')
             animation = random.choice(animations)
-            print("... playing animation {0} (random)".format(animation[0]))
-            self.play_sequence(animation[1])
+            print("... playing animation {0} (random)".format(animation['name']))
+            self.play_sequence(animation['events'])
         else:
             print("... no animation available")
 
@@ -218,5 +218,5 @@ class Hardware:
                 if len(idle_animations) > 0 and time.time() - self._last_animation_time > 5 * 60:
                     print("Idle triggered")
                     animation = random.choice(idle_animations)
-                    self.play_sequence(animation)
+                    self.play_sequence(animation['events'])
             time.sleep(5.0)
